@@ -1,18 +1,211 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-    <id>http://kain-hao.github.io</id>
+    <id>https://www.geekore.ink</id>
     <title>KainHao的博客</title>
-    <updated>2021-02-05T03:19:03.324Z</updated>
+    <updated>2021-02-11T03:27:07.087Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
-    <link rel="alternate" href="http://kain-hao.github.io"/>
-    <link rel="self" href="http://kain-hao.github.io/atom.xml"/>
-    <logo>http://kain-hao.github.io/images/avatar.png</logo>
-    <icon>http://kain-hao.github.io/favicon.ico</icon>
+    <link rel="alternate" href="https://www.geekore.ink"/>
+    <link rel="self" href="https://www.geekore.ink/atom.xml"/>
+    <subtitle>一只咸鱼的博客</subtitle>
+    <logo>https://www.geekore.ink/images/avatar.png</logo>
+    <icon>https://www.geekore.ink/favicon.ico</icon>
     <rights>All rights reserved 2021, KainHao的博客</rights>
     <entry>
+        <title type="html"><![CDATA[关于Python装饰器]]></title>
+        <id>https://www.geekore.ink/about-python-decorators/</id>
+        <link href="https://www.geekore.ink/about-python-decorators/">
+        </link>
+        <updated>2021-02-06T03:08:45.000Z</updated>
+        <content type="html"><![CDATA[<p>最近在研究FastAPI实现一个更易于操作的API框架.然后因为FastAPI的语法规则,每次都要写到<code>@app.get('')</code><br>
+那么这个@开头的奇怪东西...我虽然知道是装饰器...可是怎么用...?</p>
+<hr>
+<h1 id="简单的装饰器">简单的装饰器</h1>
+<p>比方说,你现在需要记录输出10000个数的时间,你可能会这么写:</p>
+<pre><code class="language-python">import time
+
+startTime = time.time()
+for i in range(10000):
+    print i
+endTime = time.time()
+print(endTime - startTime)
+</code></pre>
+<p>那么现在你需要记录快速排序10个数的时间,又是什么样的代码呢?</p>
+<pre><code class="language-python">import time
+
+def partition(arr,low,high): 
+    i = ( low-1 )
+    pivot = arr[high]     
+  
+    for j in range(low , high): 
+        if   arr[j] &lt;= pivot: 
+            i = i+1 
+            arr[i],arr[j] = arr[j],arr[i] 
+    arr[i+1],arr[high] = arr[high],arr[i+1] 
+    return ( i+1 ) 
+
+def quickSort(arr,low,high): 
+    if low &lt; high: 
+        pi = partition(arr,low,high) 
+        quickSort(arr, low, pi-1) 
+        quickSort(arr, pi+1, high) 
+  
+arr = [10,7,8,9,1,5,11,20,0,4] 
+n = len(arr) 
+startTime = time.time()
+quickSort(arr,0,n-1) 
+endTime = time.time()
+for i in range(n): 
+    print (&quot;%d&quot; %arr[i])
+print(endTime - startTime)
+</code></pre>
+<p>问题来了,假如你有100个算法需要计算时间,你就需要改动每个脚本里的函数<br>
+很麻烦对不对?<br>
+这里,我们可以引入装饰器</p>
+<blockquote>
+<p>装饰器本质上是一个Python函数，它可以让其他函数在不需要做任何代码变动的前提下增加额外功能，装饰器的返回值也是一个函数对象。它经常用于有切面需求的场景，比如：插入日志、性能测试、事务处理、缓存、权限校验等场景。装饰器是解决这类问题的绝佳设计，有了装饰器，我们就可以抽离出大量与函数功能本身无关的雷同代码并继续重用。<br>
+总的来讲,装饰器的功能就是在不改变函数或对象代码的情况下增添额外的功能.</p>
+</blockquote>
+<pre><code class="language-python">def timeDcrtr(func):
+    def wrapper(*args,**kargs):
+        startTime = time.time()
+        f = func(*args,**kargs)
+        endTime = time.time()
+        execTime = endTime - startTime
+        return f
+    return wrapper
+</code></pre>
+<p>上面的代码展现了如何定义一个计算时间的装饰器,我们将它再次引入上文中输出10000个数字的代码:</p>
+<pre><code class="language-python">import time
+
+def timeDcrtr(func):
+    def wrapper():
+        startTime = time.time()
+        f = func()
+        endTime = time.time()
+        execTime = endTime - startTime
+        return f
+    return wrapper
+
+@timeDcrtr # @语法糖
+for i in range(10000):
+    print i
+</code></pre>
+<p>到这里,你已经实现了Python中最简单的装饰器功能.<br>
+但是如果你要为装饰器传入参数怎么办?<br>
+因为返回的函数并不能接受参数,你可以指定装饰器函数wrapper接受和原函数一样的参数:</p>
+<pre><code class="language-python">def debug(func):
+    def wrapper(something): #指定与下面output()函数一样的参数
+        print &quot;enter {}()&quot;.format(func.__name__)
+        return func()
+    return wrapper
+
+@debug
+def output(something):
+    print &quot;hello {}!&quot;.format(something)
+
+</code></pre>
+<p>但是问题又来了: debug装饰器在一个脚本里应用还好,可是你如果有100个脚本需要使用@debug呢?你需要手动修改每个脚本里的装饰器参数吗?<br>
+别忘了python中的可变参数: <code>*args,**kwargs</code><br>
+于是我们可以打造一个接受可变参数的装饰器:</p>
+<pre><code class="language-python">def debug(func):
+    def wrapper(*args,**kwargs): 
+        print &quot;enter {}()&quot;.format(func.__name__)
+        return func()
+    return wrapper
+</code></pre>
+<h1 id="更高级的装饰器">更高级的装饰器</h1>
+<p>假设我们前文的装饰器需要完成的功能不仅仅是能在进入某个函数后打出log信息,而且还需指定log的级别,那么装饰器就会是这样的:</p>
+<pre><code class="language-python">def logging(level):
+    def wrapper(func):
+        def inner_wrapper(*args, **kwargs):
+            print &quot;[{level}]: enter function {func}()&quot;.format(
+                level=level,
+                func=func.__name__)
+            return func(*args, **kwargs)
+        return inner_wrapper
+    return wrapper
+
+@logging(level='INFO')
+def say(something):
+    print &quot;say {}!&quot;.format(something)
+
+# 如果没有使用@语法，等同于
+# say = logging(level='INFO')(say)
+
+@logging(level='DEBUG')
+def do(something):
+    print &quot;do {}...&quot;.format(something)
+
+if __name__ == '__main__':
+    say('hello')
+    do(&quot;my work&quot;)
+</code></pre>
+<p>装饰器函数其实是这样一个接口约束它,必须接受一个callable对象作为参数，,然后返回一个callable对象.在Python中一般callable对象都是函数,但也有例外,只要某个对象重载了<code>__call__()</code>方法，那么这个对象就是callable的.<br>
+装饰器要求接受一个callable对象,并返回一个callable对象.那么用类来实现也是也可以的.我们可以让类的构造函数<code>__init__()</code>接受一个函数,然后重载<code>__call__()</code>并返回一个函数,也可以达到装饰器函数的效果.</p>
+<pre><code class="language-python">class logging(object):
+    def __init__(self, func):
+        self.func = func
+
+    def __call__(self, *args, **kwargs):
+        print &quot;[DEBUG]: enter function {func}()&quot;.format(
+            func=self.func.__name__)
+        return self.func(*args, **kwargs)
+@logging
+def say(something):
+    print &quot;say {}!&quot;.format(something)
+</code></pre>
+<hr>
+<h1 id="小结">小结</h1>
+<p>装饰器的理念是对原函数、对象的加强,相当于重新封装,所以一般装饰器函数都被命名为<code>wrapper()</code>,意义在于包装.函数只有在被调用时才会发挥其作用.比如<code>@logging</code>装饰器可以在函数执行时额外输出日志,<code>@cache</code>装饰过的函数可以缓存计算结果等等.</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[嗯,Gridea真香]]></title>
+        <id>https://www.geekore.ink/hello-world/</id>
+        <link href="https://www.geekore.ink/hello-world/">
+        </link>
+        <updated>2021-02-05T04:31:46.000Z</updated>
+        <content type="html"><![CDATA[<h1 id="写在前面">写在前面</h1>
+<blockquote>
+<p>2020年4月24日建的站,一开始是Gridea,接着Wordpress,然后是Typecho,Gatsby,Jeklly,Hexo...最后换回了Gridea...<br>
+能苟延残喘大半年也真是不容易呢(赞赏)</p>
+</blockquote>
+<hr>
+<h1 id="正文">正文</h1>
+<p>这篇文章我们还是来讨论一个老掉牙的问题:</p>
+<blockquote>
+<p>如何用Gridea搭建自己的网站?</p>
+</blockquote>
+<p>但是这次我们抛开技术上的问题,从另一个角度出发</p>
+<h2 id="前期准备">前期准备</h2>
+<blockquote>
+<p>别头脑一热搭了自己的博客.<br>
+(虽然用Github Pages好像并没有什么成本的说)</p>
+</blockquote>
+<p>大部分博客的文章数目都会在30-100篇左右停止,更多的是停在第一篇博文: 如何用Hexo搭建个人博客?<br>
+所以在搭建自己的博客之前,想清楚你这个博客要写什么,怎么写,你所输出的内容有没有价值,能不能帮到他人.</p>
+<p>然后你需要一台能够持久使用的电脑(别三天两头硬盘坏了换电脑了跑群里来问Gridea文件怎么同步),一个域名<s>和你的决心</s></p>
+<p>Coding换了新版之后Gridea死活连不上...<br>
+*我的决心碎了一地</p>
+<h2 id="部署">部署</h2>
+<p>(略)<br>
+网上一堆教程我不赘述了啊...</p>
+<h2 id="后期完善">后期完善</h2>
+<p>你现在可以创作你自己的内容了,可是...</p>
+<p>谁来看?</p>
+<p>然后你需要做搜索引擎收录和SEO,做完之后终于有人来看了,这个时候你发现...</p>
+<p>有人偷了我的文章?</p>
+<p>你可能会应用一个协议(比如我现在正在用的协议CC-BY-NC-ND 4.0)</p>
+<p>嗯,到这里,你这个博客才算能用</p>
+<p>但是...</p>
+<p>最重要的是,持续不断地输出有价值的内容.</p>
+<p>以上.</p>
+]]></content>
+    </entry>
+    <entry>
         <title type="html"><![CDATA[Hello Gridea]]></title>
-        <id>http://kain-hao.github.io/post/hello-gridea/</id>
-        <link href="http://kain-hao.github.io/post/hello-gridea/">
+        <id>https://www.geekore.ink/hello-gridea/</id>
+        <link href="https://www.geekore.ink/hello-gridea/">
         </link>
         <updated>2018-12-11T16:00:00.000Z</updated>
         <summary type="html"><![CDATA[<p>👏  欢迎使用 <strong>Gridea</strong> ！<br>

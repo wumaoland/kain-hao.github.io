@@ -1,0 +1,369 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KainHao的博客</title>
+<meta name="description" content="一只咸鱼的博客" />
+<link rel="shortcut icon" href="https://www.geekore.ink/favicon.ico?v=1613014024816">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css">
+
+<link rel="stylesheet" href="https://www.geekore.ink/styles/main.css">
+
+
+
+  </head>
+  <body>
+    <div id="app" class="main px-4 flex flex-col lg:flex-row">
+      <div id="sidebar" class="sidebar-wrapper lg:static lg:w-1/4">
+  <div class="lg:sticky top-0">
+    <div class="sidebar-content">
+      <div class="flex lg:block p-4 lg:px-0 items-center fixed lg:static lg:block top-0 right-0 left-0 bg-white z-50">
+        <i class="ri-menu-2-line lg:mt-4 text-2xl cursor-pointer animated fadeIn" onclick="openMenu()"></i>
+        <a href="https://www.geekore.ink">
+          <img class="animated fadeInLeft avatar rounded-lg mx-4 lg:mt-32 lg:mx-0 mt-0 lg:w-24 lg:h-24 w-12 w-12" src="https://www.geekore.ink/images/avatar.png?v=1613014024816" alt="">
+        </a>
+        <h1 class="animated fadeInLeft lg:text-4xl font-extrabold lg:mt-8 mt-0 text-xl" style="animation-delay: 0.2s">KainHao的博客</h1>
+      </div>
+      
+        <div class="animated fadeInLeft" style="animation-delay: 0.4s">
+          <p class="my-4 text-gray-600 font-light hidden lg:block">
+            文章目录
+          </p>
+          <div class="toc-container hidden lg:block">
+            <ul class="markdownIt-TOC">
+<li><a href="#%E7%AE%80%E5%8D%95%E7%9A%84%E8%A3%85%E9%A5%B0%E5%99%A8">简单的装饰器</a></li>
+<li><a href="#%E6%9B%B4%E9%AB%98%E7%BA%A7%E7%9A%84%E8%A3%85%E9%A5%B0%E5%99%A8">更高级的装饰器</a></li>
+<li><a href="#%E5%B0%8F%E7%BB%93">小结</a></li>
+</ul>
+
+          </div>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+<div class="menu-container">
+  <i class="ri-arrow-left-line text-2xl cursor-pointer animated fadeIn close-menu-btn" onclick="closeMenu()"></i>
+  <div>
+    
+      
+        <a href="/" class="menu" style="animation-delay: 0s">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu" style="animation-delay: 0.2s">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu" style="animation-delay: 0.4s">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu" style="animation-delay: 0.6000000000000001s">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="site-footer">
+    <div class="py-4 text-gray-700">All content on this site is licensed under <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/">CC-BY-NC-ND 4.0 </a> agreement. <br />
+Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a></div>
+    <a class="rss" href="https://www.geekore.ink/atom.xml" target="_blank">RSS</a>
+  </div>
+</div>
+<div class="mask" onclick="closeMenu()">
+</div>
+      <div class="content-wrapper py-32 lg:p-8 lg:w-3/4 post-detail animated fadeIn">
+        <h1 class="text-3xl font-bold lg:mt-16">关于Python装饰器</h1>
+        <div class="text-sm text-gray-700 lg:my-8">
+          2021-02-06 / 6 min read
+        </div>
+        
+          <img class="post-feature-image rounded-lg mx-auto my-4" src="https://www.geekore.ink/post-images/about-python-decorators.jpg" alt="">
+        
+        <div class="post-content yue">
+          <p>最近在研究FastAPI实现一个更易于操作的API框架.然后因为FastAPI的语法规则,每次都要写到<code>@app.get('')</code><br>
+那么这个@开头的奇怪东西...我虽然知道是装饰器...可是怎么用...?</p>
+<hr>
+<h1 id="简单的装饰器">简单的装饰器</h1>
+<p>比方说,你现在需要记录输出10000个数的时间,你可能会这么写:</p>
+<pre><code class="language-python">import time
+
+startTime = time.time()
+for i in range(10000):
+    print i
+endTime = time.time()
+print(endTime - startTime)
+</code></pre>
+<p>那么现在你需要记录快速排序10个数的时间,又是什么样的代码呢?</p>
+<pre><code class="language-python">import time
+
+def partition(arr,low,high): 
+    i = ( low-1 )
+    pivot = arr[high]     
+  
+    for j in range(low , high): 
+        if   arr[j] &lt;= pivot: 
+            i = i+1 
+            arr[i],arr[j] = arr[j],arr[i] 
+    arr[i+1],arr[high] = arr[high],arr[i+1] 
+    return ( i+1 ) 
+
+def quickSort(arr,low,high): 
+    if low &lt; high: 
+        pi = partition(arr,low,high) 
+        quickSort(arr, low, pi-1) 
+        quickSort(arr, pi+1, high) 
+  
+arr = [10,7,8,9,1,5,11,20,0,4] 
+n = len(arr) 
+startTime = time.time()
+quickSort(arr,0,n-1) 
+endTime = time.time()
+for i in range(n): 
+    print (&quot;%d&quot; %arr[i])
+print(endTime - startTime)
+</code></pre>
+<p>问题来了,假如你有100个算法需要计算时间,你就需要改动每个脚本里的函数<br>
+很麻烦对不对?<br>
+这里,我们可以引入装饰器</p>
+<blockquote>
+<p>装饰器本质上是一个Python函数，它可以让其他函数在不需要做任何代码变动的前提下增加额外功能，装饰器的返回值也是一个函数对象。它经常用于有切面需求的场景，比如：插入日志、性能测试、事务处理、缓存、权限校验等场景。装饰器是解决这类问题的绝佳设计，有了装饰器，我们就可以抽离出大量与函数功能本身无关的雷同代码并继续重用。<br>
+总的来讲,装饰器的功能就是在不改变函数或对象代码的情况下增添额外的功能.</p>
+</blockquote>
+<pre><code class="language-python">def timeDcrtr(func):
+    def wrapper(*args,**kargs):
+        startTime = time.time()
+        f = func(*args,**kargs)
+        endTime = time.time()
+        execTime = endTime - startTime
+        return f
+    return wrapper
+</code></pre>
+<p>上面的代码展现了如何定义一个计算时间的装饰器,我们将它再次引入上文中输出10000个数字的代码:</p>
+<pre><code class="language-python">import time
+
+def timeDcrtr(func):
+    def wrapper():
+        startTime = time.time()
+        f = func()
+        endTime = time.time()
+        execTime = endTime - startTime
+        return f
+    return wrapper
+
+@timeDcrtr # @语法糖
+for i in range(10000):
+    print i
+</code></pre>
+<p>到这里,你已经实现了Python中最简单的装饰器功能.<br>
+但是如果你要为装饰器传入参数怎么办?<br>
+因为返回的函数并不能接受参数,你可以指定装饰器函数wrapper接受和原函数一样的参数:</p>
+<pre><code class="language-python">def debug(func):
+    def wrapper(something): #指定与下面output()函数一样的参数
+        print &quot;enter {}()&quot;.format(func.__name__)
+        return func()
+    return wrapper
+
+@debug
+def output(something):
+    print &quot;hello {}!&quot;.format(something)
+
+</code></pre>
+<p>但是问题又来了: debug装饰器在一个脚本里应用还好,可是你如果有100个脚本需要使用@debug呢?你需要手动修改每个脚本里的装饰器参数吗?<br>
+别忘了python中的可变参数: <code>*args,**kwargs</code><br>
+于是我们可以打造一个接受可变参数的装饰器:</p>
+<pre><code class="language-python">def debug(func):
+    def wrapper(*args,**kwargs): 
+        print &quot;enter {}()&quot;.format(func.__name__)
+        return func()
+    return wrapper
+</code></pre>
+<h1 id="更高级的装饰器">更高级的装饰器</h1>
+<p>假设我们前文的装饰器需要完成的功能不仅仅是能在进入某个函数后打出log信息,而且还需指定log的级别,那么装饰器就会是这样的:</p>
+<pre><code class="language-python">def logging(level):
+    def wrapper(func):
+        def inner_wrapper(*args, **kwargs):
+            print &quot;[{level}]: enter function {func}()&quot;.format(
+                level=level,
+                func=func.__name__)
+            return func(*args, **kwargs)
+        return inner_wrapper
+    return wrapper
+
+@logging(level='INFO')
+def say(something):
+    print &quot;say {}!&quot;.format(something)
+
+# 如果没有使用@语法，等同于
+# say = logging(level='INFO')(say)
+
+@logging(level='DEBUG')
+def do(something):
+    print &quot;do {}...&quot;.format(something)
+
+if __name__ == '__main__':
+    say('hello')
+    do(&quot;my work&quot;)
+</code></pre>
+<p>装饰器函数其实是这样一个接口约束它,必须接受一个callable对象作为参数，,然后返回一个callable对象.在Python中一般callable对象都是函数,但也有例外,只要某个对象重载了<code>__call__()</code>方法，那么这个对象就是callable的.<br>
+装饰器要求接受一个callable对象,并返回一个callable对象.那么用类来实现也是也可以的.我们可以让类的构造函数<code>__init__()</code>接受一个函数,然后重载<code>__call__()</code>并返回一个函数,也可以达到装饰器函数的效果.</p>
+<pre><code class="language-python">class logging(object):
+    def __init__(self, func):
+        self.func = func
+
+    def __call__(self, *args, **kwargs):
+        print &quot;[DEBUG]: enter function {func}()&quot;.format(
+            func=self.func.__name__)
+        return self.func(*args, **kwargs)
+@logging
+def say(something):
+    print &quot;say {}!&quot;.format(something)
+</code></pre>
+<hr>
+<h1 id="小结">小结</h1>
+<p>装饰器的理念是对原函数、对象的加强,相当于重新封装,所以一般装饰器函数都被命名为<code>wrapper()</code>,意义在于包装.函数只有在被调用时才会发挥其作用.比如<code>@logging</code>装饰器可以在函数执行时额外输出日志,<code>@cache</code>装饰过的函数可以缓存计算结果等等.</p>
+
+        </div>
+
+        
+          <a class="animated fadeInUp p-2 items-center text-sm text-gray-700 border hover:bg-gray-300 leading-none rounded-full flex lg:inline-flex m-4 " href="https://www.geekore.ink/tag/FqfslSvJt/">
+            <span class="flex-auto">Python</span>
+          </a>
+        
+          <a class="animated fadeInUp p-2 items-center text-sm text-gray-700 border hover:bg-gray-300 leading-none rounded-full flex lg:inline-flex m-4 " href="https://www.geekore.ink/tag/YcBPiUZhrv/">
+            <span class="flex-auto">开发</span>
+          </a>
+        
+
+
+        <div class="flex justify-between py-8">
+          
+
+          
+            <div class="next-post">
+              <a href="https://www.geekore.ink/hello-world/">
+                <h3 class="post-title">
+                  嗯,Gridea真香
+                  <i class="ri-arrow-right-line"></i>
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+
+        
+
+      </div>
+    </div>
+
+    <script src="https://www.geekore.ink/media/prism.js"></script>  
+<script>
+
+Prism.highlightAll()
+let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+// This should probably be throttled.
+// Especially because it triggers during smooth scrolling.
+// https://lodash.com/docs/4.17.10#throttle
+// You could do like...
+// window.addEventListener("scroll", () => {
+//    _.throttle(doThatStuff, 100);
+// });
+// Only not doing it here to keep this Pen dependency-free.
+
+window.addEventListener("scroll", event => {
+  let fromTop = window.scrollY;
+
+  mainNavLinks.forEach((link, index) => {
+    let section = document.getElementById(decodeURI(link.hash).substring(1));
+    let nextSection = null
+    if (mainNavLinks[index + 1]) {
+      nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+    }
+    if (section.offsetTop <= fromTop) {
+      if (nextSection) {
+        if (nextSection.offsetTop > fromTop) {
+          link.classList.add("current");
+        } else {
+          link.classList.remove("current");    
+        }
+      } else {
+        link.classList.add("current");
+      }
+    } else {
+      link.classList.remove("current");
+    }
+  });
+});
+
+
+document.addEventListener("DOMContentLoaded", function() {
+  var lazyImages = [].slice.call(document.querySelectorAll(".post-feature-image.lazy"));
+
+  if ("IntersectionObserver" in window) {
+    let lazyImageObserver = new IntersectionObserver(function(entries, observer) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          let lazyImage = entry.target
+          lazyImage.style.backgroundImage = `url(${lazyImage.dataset.bg})`
+          lazyImage.classList.remove("lazy")
+          lazyImageObserver.unobserve(lazyImage)
+        }
+      });
+    });
+
+    lazyImages.forEach(function(lazyImage) {
+      lazyImageObserver.observe(lazyImage)
+    })
+  } else {
+    // Possibly fall back to a more compatible method here
+  }
+});
+
+const menuContainer = document.querySelector('.menu-container')
+const menus = document.querySelectorAll('.menu-container .menu')
+const mask = document.querySelector('.mask')
+const contentWrapper = document.querySelector('.content-wrapper')
+const latestArticle = document.querySelector('.latest-article')
+const readMore = document.querySelector('.read-more')
+const indexPage = document.querySelector('.index-page')
+
+const isHome = location.pathname === '/'
+if (latestArticle) {
+  latestArticle.style.display = isHome ? 'block' : 'none'
+  readMore.style.display = isHome ? 'block' : 'none'
+  indexPage.style.display = isHome ? 'none' : 'block'
+}
+
+const openMenu = () => {
+  menuContainer.classList.add('open')
+  menus.forEach(menu => {
+    menu.classList.add('animated', 'fadeInLeft')
+  })
+  mask.classList.add('open')
+  contentWrapper.classList.add('is-second')
+}
+
+const closeMenu = () => {
+  menuContainer.classList.remove('open')
+  menus.forEach(menu => {
+    menu.classList.remove('animated', 'fadeInLeft')
+  })
+  mask.classList.remove('open')
+  contentWrapper.classList.remove('is-second')
+}
+</script>
+  
+  </body>
+</html>
