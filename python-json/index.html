@@ -30,42 +30,15 @@
       
         <div class="animated fadeInLeft" style="animation-delay: 0.4s">
           <p class="my-4 text-gray-600 font-light hidden lg:block">
-            一只咸鱼的博客
+            文章目录
           </p>
-          <div class="animated fadeInLeft social-container hidden lg:block" style="animation-delay: 0.6s">
-            
-              
-                <a href="https://github.com/kain-hao" target="_blank" class="mr-4 text-xl text-gray-400 font-light hover:text-gray-900">
-                  <i class="ri-github-line"></i>
-                </a>
-              
-            
-              
-            
-              
-                <a href="https://weibo.com/u/6520656817" target="_blank" class="mr-4 text-xl text-gray-400 font-light hover:text-gray-900">
-                  <i class="ri-weibo-line"></i>
-                </a>
-              
-            
-              
-                <a href="https://www.zhihu.com/people/revive-44-71" target="_blank" class="mr-4 text-xl text-gray-400 font-light hover:text-gray-900">
-                  <i class="ri-zhihu-line"></i>
-                </a>
-              
-            
-              
-            
-              
-            
-              
-            
-              
-            
-              
-            
-              
-            
+          <div class="toc-container hidden lg:block">
+            <ul class="markdownIt-TOC">
+<li><a href="#%E5%BC%95%E5%85%A5">引入</a></li>
+<li><a href="#%E7%BC%96%E7%A0%81">编码:</a></li>
+<li><a href="#%E8%A7%A3%E7%A0%81">解码</a></li>
+</ul>
+
           </div>
         </div>
       
@@ -110,28 +83,82 @@ Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea<
 </div>
 <div class="mask" onclick="closeMenu()">
 </div>
-      <div class="content-wrapper py-32 lg:p-8 lg:w-3/4">
-        <h2 class="text-lg text-gray-700 mb-8">
-          <i class="ri-bookmark-line"></i> 闲谈
-        </h2>
+      <div class="content-wrapper py-32 lg:p-8 lg:w-3/4 post-detail animated fadeIn">
+        <h1 class="text-3xl font-bold lg:mt-16">Python json库</h1>
+        <div class="text-sm text-gray-700 lg:my-8">
+          2021-02-12 / 1 min read
+        </div>
         
-  <section class="post-item md:flex pb-12 animated fadeIn" :style="{ 'animation-delay': `${0 * 0.2}s` }">
-    
-    <div class="content">
-      <a href="https://www.geekore.ink/hello-world/">
-        <h2 class="post-title text-xl font-extrabold mt-5 md:mt-0">嗯,Gridea真香</h2>
-      </a>
-      <div class="post-abstract text-gray-700 font-light my-4">
+          <img class="post-feature-image rounded-lg mx-auto my-4" src="https://www.geekore.ink/post-images/python-json.jpg" alt="">
         
-      </div>
-      <div class="text-gray-400 text-sm font-light">2021-02-05 / 2 min read</div>
-    </div>
-  </section>
+        <div class="post-content yue">
+          <p>来介绍下Python中自带的一个库: json</p>
+<hr>
+<h1 id="引入">引入</h1>
+<p>在你安装Python时json应已经被安装</p>
+<pre><code class="language-python">import json
+</code></pre>
+<h1 id="编码">编码:</h1>
+<p>语法:</p>
+<pre><code class="language-python">json.dumps(obj, skipkeys=False, ensure_ascii=True, check_circular=True, allow_nan=True, cls=None, indent=None, separators=None, encoding=&quot;utf-8&quot;, default=None, sort_keys=False, **kw)
+</code></pre>
+<p>实例:</p>
+<pre><code class="language-python">import json
 
-        <div class="pagination-container animated fadeIn">
-  
-  
-</div>
+dataRaw = [ {'a':1,'b':2}]
+
+data = json.dumps(dataRaw)
+print(data)
+</code></pre>
+<h1 id="解码">解码</h1>
+<p>语法:</p>
+<pre><code class="language-python">json.loads(s[, encoding[, cls[, object_hook[, parse_float[, parse_int[, parse_constant[, object_pairs_hook[, **kw]]]]]]]])
+</code></pre>
+<p>实例:</p>
+<pre><code class="language-python">import json
+
+dataRaw = '{&quot;a&quot;:1,&quot;b&quot;:2}'
+
+data = json.loads(dataRaw)
+print(data)
+</code></pre>
+<hr>
+<p>你还可以使用<code>json.load</code>和<code>json.dump</code>来处理和JSON相关的文件.</p>
+<p><s>今日水文+1,不想写了就这样吧</s></p>
+
+        </div>
+
+        
+          <a class="animated fadeInUp p-2 items-center text-sm text-gray-700 border hover:bg-gray-300 leading-none rounded-full flex lg:inline-flex m-4 " href="https://www.geekore.ink/tag/d2lDn3eTS/">
+            <span class="flex-auto">JSON</span>
+          </a>
+        
+          <a class="animated fadeInUp p-2 items-center text-sm text-gray-700 border hover:bg-gray-300 leading-none rounded-full flex lg:inline-flex m-4 " href="https://www.geekore.ink/tag/FqfslSvJt/">
+            <span class="flex-auto">Python</span>
+          </a>
+        
+          <a class="animated fadeInUp p-2 items-center text-sm text-gray-700 border hover:bg-gray-300 leading-none rounded-full flex lg:inline-flex m-4 " href="https://www.geekore.ink/tag/YcBPiUZhrv/">
+            <span class="flex-auto">开发</span>
+          </a>
+        
+
+
+        <div class="flex justify-between py-8">
+          
+
+          
+            <div class="next-post">
+              <a href="https://www.geekore.ink/nodejs-1/">
+                <h3 class="post-title">
+                  Node.js初探
+                  <i class="ri-arrow-right-line"></i>
+                </h3>
+              </a>
+            </div>
+          
+        </div>
+
+        
 
       </div>
     </div>
