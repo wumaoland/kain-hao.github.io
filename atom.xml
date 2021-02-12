@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://www.geekore.ink</id>
     <title>KainHao的博客</title>
-    <updated>2021-02-11T03:27:07.087Z</updated>
+    <updated>2021-02-12T10:00:03.903Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://www.geekore.ink"/>
     <link rel="self" href="https://www.geekore.ink/atom.xml"/>
@@ -10,6 +10,206 @@
     <logo>https://www.geekore.ink/images/avatar.png</logo>
     <icon>https://www.geekore.ink/favicon.ico</icon>
     <rights>All rights reserved 2021, KainHao的博客</rights>
+    <entry>
+        <title type="html"><![CDATA[Node.js初探]]></title>
+        <id>https://www.geekore.ink/nodejs-1/</id>
+        <link href="https://www.geekore.ink/nodejs-1/">
+        </link>
+        <updated>2021-02-12T09:59:41.000Z</updated>
+        <content type="html"><![CDATA[<h1 id="写在前面">写在前面</h1>
+<p>Node.js,顾名思义,是基于Chrome V8引擎的异步/非阻塞JavaScript运行环境(解析器).<br>
+讲简单点就是跑在服务器端的JavaScript.</p>
+<hr>
+<h1 id="0x01-安装与repl使用">0x01 安装与REPL使用</h1>
+<h2 id="1-安装">.1 安装</h2>
+<h3 id="linux下安装">Linux下安装</h3>
+<p>用自带的包管理器安装即可.<br>
+这里以Ubuntu 20.04 LTS为例:</p>
+<pre><code class="language-bash">apt install nodejs &amp;&amp; apt install npm
+</code></pre>
+<p>然后执行 <code>node -v</code>和<code>npm -v</code>,看到输出就说明安装成功.<br>
+然后鉴于apt默认源里NodeJs并非最新版,另外官方源速度太慢,我们可以安装NodeJs的版本管理器和软件源工具:</p>
+<pre><code class="language-bash">npm cache clean --force #清除缓存
+npm install -g n
+npm install -g nrm
+</code></pre>
+<p>然后执行</p>
+<pre><code class="language-bash">n stable # 安装最新稳定版
+nrm use taobao # 将软件源设定为淘宝源(https://registry.npm.taobao.org/)
+</code></pre>
+<h3 id="windows下安装">Windows下安装</h3>
+<p>由于种种原因并不推荐在Windows环境下直接安装NodeJs进行开发和调试<br>
+<em>所以啊,亲爱的少年——</em><br>
+<em>给我乖乖地装好WSL在Linux下code吧!</em><br>
+<s>才不是我懒得在Windows下安装然后截图呢</s></p>
+<h2 id="2-使用">.2 使用</h2>
+<h3 id="nodejs-repl交互式环境">NodeJs REPL(交互式环境)</h3>
+<p>NodeJs像Python一样提供了基于V8(不是Vtuber吧)引擎的交互式编程环境<br>
+<s>真是开发的好工具呢(赞赏)</s><br>
+在命令行环境下输入<code>node</code>即可进入REPL<br>
+<s>推荐第一次进入REPL时执行<code>.1 + .2</code></s><br>
+REPL中可以定义并启动服务器:</p>
+<pre><code class="language-javascript">var http = require('http')
+http.createServer(function(req, res){  
+...    res.writeHead(200, {'Content-Type':'text/html'});
+...    res.end('hello world');       
+...  }).listen(8080, &quot;127.0.0.1&quot;)
+</code></pre>
+<p>此外,REPL还有一些基本的快捷键与命令:</p>
+<ul>
+<li><kbd>Ctrl</kbd>+<kbd>C</kdb>: 退出当前终端</li>
+<li>两次<kbd>Ctrl</kbd>+<kbd>C</kbd>: 退出REPL。</li>
+<li><kbd>Ctrl</kbd>+<kbd>D</kbd>: 退出REPL.</li>
+<li><kbd>↑</kbd>或<kbd>↓</kbd>: 查看历史命令</li>
+<li><kbd>Tab</kbd>: 列出当前命令</li>
+<li><code>.help</code> : 帮助</li>
+<li><code>.break</code>: 退出多行表达式</li>
+<li>.<code>clear</code>: 退出多行表达式</li>
+<li><code>.save [name]</code>: 保存当前的 Node REPL 会话到指定文件,<em>[name]为文件名,可变</em></li>
+<li><code>.load [name]</code>: 载入保存过的REPL会话的文件,<em>[name]为文件名,可变</em></li>
+</ul>
+<hr>
+<h1 id="0x02-nodejs函数-回调函数与事件循环">0x02 Node.js函数、回调函数与事件循环</h1>
+<h2 id="1-函数">.1 函数</h2>
+<p>Node.js中的函数定义与JavaScript无异:</p>
+<pre><code class="language-javascript">function myFunction(x) {
+    return x * x;
+}
+</code></pre>
+<p>特性(?)也与JavaScript类似:</p>
+<pre><code class="language-javascript">function myFunction(x) {
+    return x * x;
+}
+
+function debug(functionName, value) {
+  functionName(value);
+}
+
+debug(myFunction,1);
+debug(function(x){ return x * x},2);  //这是一个匿名函数
+</code></pre>
+<h2 id="2-回调函数">.2 回调函数</h2>
+<h3 id="前置概念">前置概念</h3>
+<blockquote>
+<p>这里写的好乱...而且错误不断...等我过几天单独整理一篇文章出来,你可以暂时跳过这部分...</p>
+</blockquote>
+<p>在了解回调函数之前,我们先来复习一下同步/异步、阻塞/非阻塞和回调的概念:<br>
+首先:</p>
+<ul>
+<li>A &quot;callback&quot; is any function that is called by another function which takes the first function as a parameter. (回调就是在一个函数中调用另一个函数)</li>
+<li>JavaScript是一门<strong>单线程</strong>的语言,</li>
+</ul>
+<h4 id="同步异步">同步/异步</h4>
+<p>同步的概念很好理解:  调用者主动等待这个调用的结果,例如:</p>
+<pre><code class="language-javascript">function myFunction(x){
+    console.log(x);
+}
+
+myFunction(&quot;Hello World!&quot;);
+</code></pre>
+<p>在你调用myFunction到输出&quot;Hello World!&quot;的这段时间,你在处理完毕之前等待系统处理这个调用,然后得到返回值.<br>
+而异步则是调用后直接返回(没有返回数据),待到处理完通过状态或回调函数等通知调用者<br>
+老师给我们举过这么一个例子:</p>
+<blockquote>
+<p>你打电话给书店老板,问这个月的《<s>知乎</s>故事汇》到了没,书店老板的回应方式:<br>
+同步: &quot;我找找,你先别挂&quot;,然后开始找书,经过了可能是两秒,也可能是一天,找到了,在电话中回应你.<br>
+异步: &quot;我找找,找到了给你打电话&quot;,然后开始找书,找到了之后电话通知你.</p>
+</blockquote>
+<p>所以同步和异步关注的是书店老板(被调用者)的状态.<br>
+<em>异步函数必须指定回调函数,异步编程依托于回调函数实现</em></p>
+<h4 id="阻塞非阻塞">阻塞/非阻塞</h4>
+<p>还是书店老板的例子:<br>
+在书店老板开始找书让你等着的时候,你选择了:</p>
+<ul>
+<li>阻塞: 等待直到老板通知你</li>
+<li>非阻塞: 去做其他事情</li>
+</ul>
+<p>阻塞/非阻塞关注的是你(调用者)的状态<br>
+<em>阻塞/非阻塞与同步/异步无关</em></p>
+<p>前面提到过Node.js异步编程,而异步编程的直接体现就是回调函数,回调函数一般作为函数的最后一个参数.<br>
+下面提供了一个非阻塞编程的实例:<br>
+创建文件file.txt,内容如下:</p>
+<pre><code>Hello World!!
+</code></pre>
+<p>app.js,内容如下:</p>
+<pre><code class="language-javascript">const fs = require('fs');  //引入文件系统
+
+fs.readFile('file.txt', function (err, data) {
+    if (err) return console.error(err);
+    console.log(data.toString());
+});
+
+
+console.log(&quot;Finish(?&quot;);
+</code></pre>
+<p>运行结果如下:</p>
+<pre><code>&gt; node app.js
+Finish(?
+Hello World!!
+</code></pre>
+<p>不需要等待文件读取完,在读取文件时执行接下来的代码.</p>
+<h2 id="3-事件循环">.3 事件循环</h2>
+<p>当一个异步事件发生时,将会生成一个事件观察者,然后线程将进入一个类似while(true)的循环之中,直到没有事件观察者时退出.<br>
+例子如下:</p>
+<pre><code class="language-javascript">var events = require('events');
+var eventEmitters = new events.EventEmitter();
+var connectHandle = function connected(){
+    console.log('再执行eventHandle');
+    eventEmitters.emit('data-receive')
+}
+
+eventEmitters.on('data-receive',function(){
+    console.log('最后接收数据');
+})
+
+eventEmitters.on('connection',connectHandle);
+console.log('先执行connection');
+eventEmitters.emit('connection');
+console.log('程序处理完成');
+</code></pre>
+<h1 id="0x03-getpost请求">0x03 GET/POST请求</h1>
+<blockquote>
+<p>util模块下篇再介绍...(咕咕预定)</p>
+</blockquote>
+<h2 id="1-get请求">.1 GET请求:</h2>
+<pre><code class="language-javascript">//引入模块
+var http = require('http');
+var url = require('url');
+var util = require('util');
+ 
+http.createServer(function(req, res){
+    res.writeHead(200, {'Content-Type': 'text/plain; charset=utf-8'}); //向请求写入相应头
+    res.end(util.inspect(url.parse(req.url, true))); //解析URL内容
+    var params = url.parse(req.url, true).query;
+    res.write(params.a);
+    res.end();
+}).listen(8080);
+</code></pre>
+<p>你现在可以向<code>http://localhost:8080/?a=Hello World!</code>发送一个GET请求查看输出</p>
+<h2 id="2-post请求">.2 POST请求</h2>
+<pre><code class="language-javascript">var http = require('http');
+var querystring = require('querystring');
+var util = require('util');
+ 
+http.createServer(function(req, res){
+    // 定义了一个post变量，用于暂存请求体的信息
+    var post = '';     
+ 
+    // 通过req的data事件监听函数，每当接受到请求体的数据，就累加到post变量中
+    req.on('data', function(chunk){    
+        post += chunk;
+    });
+ 
+    // 在end事件触发后，通过querystring.parse将post解析为真正的POST请求格式，然后向客户端返回。
+    req.on('end', function(){    
+        post = querystring.parse(post);
+        res.end(util.inspect(post));
+    });
+}).listen(8080);
+</code></pre>
+<p><em>Node.js默认不会解析POST请求体</em></p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[关于Python装饰器]]></title>
         <id>https://www.geekore.ink/about-python-decorators/</id>
