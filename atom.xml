@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://www.geekore.ink</id>
     <title>KainHao的博客</title>
-    <updated>2021-03-05T10:26:59.092Z</updated>
+    <updated>2021-03-08T08:41:01.991Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://www.geekore.ink"/>
     <link rel="self" href="https://www.geekore.ink/atom.xml"/>
@@ -57,8 +57,8 @@
     </entry>
     <entry>
         <title type="html"><![CDATA[从0开始的分布式系统学习Day1]]></title>
-        <id>https://www.geekore.ink/cong-0-kai-shi-de-fen-bu-shi-xi-tong-xue-xi-day1/</id>
-        <link href="https://www.geekore.ink/cong-0-kai-shi-de-fen-bu-shi-xi-tong-xue-xi-day1/">
+        <id>https://www.geekore.ink/scalability-day1/</id>
+        <link href="https://www.geekore.ink/scalability-day1/">
         </link>
         <updated>2021-02-19T02:20:08.000Z</updated>
         <content type="html"><![CDATA[<p><s>换到了Vercel,为什么觉得比GitHub Pages还慢</s></p>
